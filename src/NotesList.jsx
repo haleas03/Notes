@@ -19,6 +19,7 @@ export default function NotesList({ notes, onSelect, selectedNoteId, onCreate, o
         <div
           key={note.id}
           onClick={() => onSelect(note.id)}
+          className="note-item"
           style={{
             padding: 10,
             marginBottom: 10,
