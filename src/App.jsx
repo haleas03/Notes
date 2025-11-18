@@ -2,39 +2,41 @@ import NotesList from "./NotesList";
 import NoteEditor from "./NoteEditor";
 import { useState, useEffect } from "react";
 
-export default function App(){
+export default function App() {
   const [notes, setNotes] = useState([]);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
 
-  useEffect (() => {
+  useEffect(() => {
     const saved = localStorage.getItem("notes");
-    if (saved) setNotes (JSON.parse(saved));
+    if (saved) setNotes(JSON.parse(saved));
   }, []);
 
-  useEffect(() =>{
+  useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]) 
+  }, [notes])
 
   const createNote = () => {
     const newNote = {
-      id: Date.now(), 
-      title: "Nueva nota", 
-      content: "", 
+      id: Date.now(),
+      title: "Nueva nota",
+      content: "",
       updated: new Date().toISOString(),
     };
 
-    setNotes ([newNote, ...notes]);
+    setNotes([newNote, ...notes]);
     setSelectedNoteId(newNote.id);
   };
 
   const updateNote = (id, updatedFields) => {
-    setNotes(
-      notes.map((n) =>
-      n.id === id 
-      ? { ...n, ...updatedFields, updated: new Date().toISOString() }
-      : n
-      )
-    );
+    setNotes(prevNotes => {
+      const filtered = prevNotes.filter(n => n.id !== id);
+      const updatedNote = {
+        ...prevNotes.find(n => n.id === id),
+        ...updatedFields,
+        updated: new Date().toISOString(),
+      };
+      return [updatedNote, ...filtered];
+    });
   };
 
   const deleteNote = (id) => {
@@ -44,16 +46,16 @@ export default function App(){
     }
   };
 
-  const selectedNote = notes.find((n) => n.id === selectedNoteId) || null; 
+  const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
 
-  return(
-    <div style={{display: "flex", height: "100vh" }}>
+  return (
+    <div style={{ display: "flex", height: "100vh" }}>
       <NotesList
-      notes={notes}
-      onSelect={setSelectedNoteId}
-      selectedNoteId={selectedNoteId}
-      onCreate={createNote}
-      onDelete={deleteNote}
+        notes={notes}
+        onSelect={setSelectedNoteId}
+        selectedNoteId={selectedNoteId}
+        onCreate={createNote}
+        onDelete={deleteNote}
       />
 
       <NoteEditor note={selectedNote} onUpdate={updateNote} />
