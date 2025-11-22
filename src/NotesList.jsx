@@ -1,4 +1,13 @@
+import { useState } from "react";
+
 export default function NotesList({ notes, onSelect, selectedNoteId, onCreate, onDelete }) {
+  const [search, setSearch] = useState("");
+
+const filteredNotes = notes.filter((note) => 
+note.title.toLowerCase().includes(search.toLowerCase()) ||
+(note.body || "").toLowerCase().includes(search.toLowerCase())
+);
+
   return (
     <div
       style={{
@@ -8,6 +17,22 @@ export default function NotesList({ notes, onSelect, selectedNoteId, onCreate, o
         overflowY: "auto",
       }}
     >
+
+<input 
+type="text"
+placeholder="Buscar notas..."
+value={search}
+onChange={(e) => setSearch(e.target.value)}
+style={{
+  padding: 10,
+  width: "100%",
+  marginBottom:15, 
+  borderRadius: 8, 
+  border: "1px solid #ccc",
+  outline: "none",
+}}
+/>
+
       <button
         onClick={onCreate}
         style={{ marginBottom: 20, padding: 10, width: "100%" }}
@@ -15,7 +40,7 @@ export default function NotesList({ notes, onSelect, selectedNoteId, onCreate, o
         Nueva nota
       </button>
 
-      {notes.map((note) => (
+      {filteredNotes.map((note) => (
         <div
           key={note.id}
           onClick={() => onSelect(note.id)}
